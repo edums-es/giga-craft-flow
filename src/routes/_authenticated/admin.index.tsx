@@ -5,7 +5,7 @@ import { AdminShell, StatCard } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/pricing";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Dashboard — Painel Giga" }, { name: "robots", content: "noindex" }] }),
   component: Dashboard,
 });
