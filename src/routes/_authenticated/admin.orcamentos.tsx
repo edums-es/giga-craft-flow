@@ -51,7 +51,7 @@ function OrcamentosPage() {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from("quotes").update({ status }).eq("id", id);
+      const { error } = await supabase.from("quotes").update({ status: status as never }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["quotes"] }),
@@ -72,10 +72,10 @@ function OrcamentosPage() {
         cliente_nome: q.cliente_nome,
         cliente_whatsapp: q.cliente_whatsapp,
         total: q.total,
-        status: "aguardando_arte",
+        status: "aguardando_arte" as never,
       });
       if (e1) throw e1;
-      const { error: e2 } = await supabase.from("quotes").update({ status: "convertido" }).eq("id", q.id);
+      const { error: e2 } = await supabase.from("quotes").update({ status: "convertido" as never }).eq("id", q.id);
       if (e2) throw e2;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["quotes"] }),

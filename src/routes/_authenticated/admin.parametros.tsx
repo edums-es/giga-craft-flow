@@ -39,7 +39,7 @@ function ParametrosPage() {
   const save = useMutation({
     mutationFn: async () => {
       if (!params) return;
-      const { error } = await supabase.from("pricing_params").update({ params, updated_at: new Date().toISOString() }).eq("id", 1);
+      const { error } = await supabase.from("pricing_params").update({ params: params as unknown as never, updated_at: new Date().toISOString() }).eq("id", 1);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["pricing_params"] }),
