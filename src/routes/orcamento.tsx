@@ -8,6 +8,7 @@ import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { useCart, removeFromCart, clearCart, useHydrated } from "@/lib/cart";
 import { formatBRL } from "@/lib/pricing";
 import { SITE, whatsappLink, novoCodigoOrcamento } from "@/lib/site-config";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/orcamento")({
   head: () => ({
@@ -41,7 +42,7 @@ function OrcamentoPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleFinalize = (e: React.FormEvent) => {
+  const handleFinalize = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = clienteSchema.safeParse(form);
     if (!parsed.success) {
@@ -54,8 +55,31 @@ function OrcamentoPage() {
     if (items.length === 0) return;
 
     const codigo = novoCodigoOrcamento();
+    // Persiste na base (RLS permite insert anônimo com validação)
+    try {
+      await supabase.from("quotes").insert({
+        codigo,
+        cliente_nome: parsed.data.nome,
+        cliente_whatsapp: parsed.data.whatsapp,
+        cliente_email: parsed.data.email || null,
+        cliente_empresa: parsed.data.empresa || null,
+        cliente_cidade: parsed.data.cidade || null,
+        observacao: parsed.data.observacao || null,
+        items: items.map((i) => ({
+          nome: i.nome,
+          quantidade: i.config.quantidade,
+          precoUnitario: i.precoUnitario,
+          precoTotal: i.precoTotal,
+          resumo: i.resumo,
+          observacao: i.observacao ?? null,
+        })) as never,
+        total,
+        prazo_dias: prazoMax,
+      });
+    } catch (err) {
+      console.error("Falha ao salvar orçamento", err);
+    }
     const mensagem = buildMessage(codigo, parsed.data, items, total, prazoMax);
-    // TODO Fase 2: gravar no banco (Lovable Cloud) antes de abrir o WhatsApp.
     window.open(whatsappLink(mensagem), "_blank");
     clearCart();
   };
