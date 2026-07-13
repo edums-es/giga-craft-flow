@@ -36,37 +36,43 @@
   --color-ink: var(--ink);
   --color-cream: var(--cream);
   --color-nude: var(--nude);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.85rem;
 
-  /* Giga palette */
-  --cream: oklch(0.985 0.006 80);
-  --nude: oklch(0.955 0.018 55);
-  --rose-gold: oklch(0.72 0.09 40);
-  --rose-gold-soft: oklch(0.86 0.05 40);
-  --ink: oklch(0.22 0.04 260);
+  /* Giga dark palette */
+  --ink: oklch(0.09 0.01 260);           /* deep near-black */
+  --surface: oklch(0.14 0.012 265);      /* card base */
+  --surface-2: oklch(0.18 0.014 265);    /* elevated */
+  --cream: oklch(0.96 0.012 80);
+  --nude: oklch(0.24 0.02 40);
+  --rose-gold: oklch(0.78 0.11 45);
+  --rose-gold-soft: oklch(0.88 0.06 45);
 
-  --background: var(--cream);
-  --foreground: var(--ink);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--ink);
-  --popover: oklch(1 0 0);
-  --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--cream);
-  --secondary: var(--nude);
-  --secondary-foreground: var(--ink);
-  --muted: oklch(0.96 0.012 60);
-  --muted-foreground: oklch(0.5 0.02 260);
+  --background: var(--ink);
+  --foreground: var(--cream);
+  --card: var(--surface);
+  --card-foreground: var(--cream);
+  --popover: var(--surface-2);
+  --popover-foreground: var(--cream);
+  --primary: var(--rose-gold);
+  --primary-foreground: oklch(0.12 0.01 260);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--cream);
+  --muted: var(--surface-2);
+  --muted-foreground: oklch(0.68 0.012 260);
   --accent: var(--rose-gold);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.55 0.22 27);
+  --accent-foreground: oklch(0.12 0.01 260);
+  --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.015 60);
-  --input: oklch(0.92 0.012 60);
+  --border: oklch(0.26 0.01 260);
+  --input: oklch(0.22 0.012 260);
   --ring: var(--rose-gold);
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -83,6 +89,11 @@
     font-family: var(--font-display);
     font-weight: 500;
     letter-spacing: -0.01em;
+    color: var(--color-foreground);
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-rose-gold) 40%, transparent);
+    color: var(--color-cream);
   }
 }
 
@@ -100,11 +111,12 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  background: var(--color-ink);
+  background: var(--color-surface-2);
   color: var(--color-cream);
+  border: 1px solid var(--color-border);
   font-weight: 500;
   transition: all 0.2s ease;
-  &:hover { background: color-mix(in oklab, var(--color-ink) 88%, white); }
+  &:hover { border-color: var(--color-rose-gold); }
 }
 
 @utility btn-gold {
@@ -115,11 +127,11 @@
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   background: linear-gradient(135deg, var(--color-rose-gold), var(--color-rose-gold-soft));
-  color: white;
-  font-weight: 500;
+  color: oklch(0.12 0.01 260);
+  font-weight: 600;
   box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--color-rose-gold) 55%, transparent);
-  transition: transform 0.2s ease;
-  &:hover { transform: translateY(-1px); }
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover { transform: translateY(-1px); box-shadow: 0 14px 34px -12px color-mix(in oklab, var(--color-rose-gold) 65%, transparent); }
 }
 
 @utility card-elegant {
@@ -128,7 +140,7 @@
   border-radius: var(--radius-xl);
   transition: all 0.25s ease;
   &:hover {
-    box-shadow: 0 20px 45px -25px color-mix(in oklab, var(--color-ink) 25%, transparent);
+    box-shadow: 0 20px 45px -25px color-mix(in oklab, var(--color-rose-gold) 25%, transparent);
     border-color: color-mix(in oklab, var(--color-rose-gold) 45%, transparent);
   }
 }
@@ -138,4 +150,10 @@
   width: 3rem;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--color-rose-gold), transparent);
+}
+
+@utility surface-panel {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
