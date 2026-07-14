@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { CATEGORIAS, PRODUTOS } from "@/data/catalog";
-import logo from "@/assets/giga-logo.asset.json";
+import { useSiteBrandConfig } from "@/lib/use-site-brand-config";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const destaques = PRODUTOS.filter((p) => p.destaque);
+  const brand = useSiteBrandConfig();
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -26,10 +27,11 @@ function Home() {
               Papelaria artesanal premium
             </span>
             <h1 className="mt-6 font-display text-5xl leading-[1.05] text-foreground md:text-6xl">
-              Sacolas, tags e cartões <span className="italic text-accent">com a alma</span> da sua marca.
+              Sacolas, tags e cartões <span className="text-accent">com a alma</span> da sua marca.
             </h1>
             <p className="mt-6 max-w-lg text-lg text-muted-foreground">
-              Monte seu orçamento em minutos: escolha o produto, personalize e finalize direto no WhatsApp. Sem cadastro, sem burocracia.
+              Monte seu orçamento em minutos: escolha o produto, personalize e finalize direto no
+              WhatsApp. Sem cadastro, sem burocracia.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/catalogo" className="btn-gold">
@@ -44,14 +46,27 @@ function Home() {
               </Link>
             </div>
             <div className="mt-10 grid gap-6 text-sm text-muted-foreground sm:grid-cols-3">
-              <Feature icon={<Clock className="h-4 w-4" />} label="Preço e prazo estimados na hora" />
-              <Feature icon={<Sparkles className="h-4 w-4" />} label="Papel premium e acabamento fino" />
-              <Feature icon={<ShieldCheck className="h-4 w-4" />} label="Aprovação de arte antes de imprimir" />
+              <Feature
+                icon={<Clock className="h-4 w-4" />}
+                label="Preço e prazo estimados na hora"
+              />
+              <Feature
+                icon={<Sparkles className="h-4 w-4" />}
+                label="Papel premium e acabamento fino"
+              />
+              <Feature
+                icon={<ShieldCheck className="h-4 w-4" />}
+                label="Aprovação de arte antes de imprimir"
+              />
             </div>
           </div>
           <div className="relative">
             <div className="mx-auto flex aspect-square w-full max-w-md items-center justify-center rounded-3xl bg-gradient-to-br from-nude via-card to-rose-gold-soft/40 p-10 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)]">
-              <img src={logo.url} alt="Giga Personalizados" className="w-full max-w-xs" />
+              <img
+                src={brand.logoUrl}
+                alt={brand.nome}
+                className="w-full max-w-xs object-contain"
+              />
             </div>
           </div>
         </div>
@@ -71,7 +86,8 @@ function Home() {
               <p className="font-display text-2xl text-foreground">{c.nome}</p>
               <p className="mt-2 text-sm text-muted-foreground">{c.descricao}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm text-accent">
-                Ver produtos <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                Ver produtos{" "}
+                <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
               </span>
             </Link>
           ))}
@@ -111,7 +127,9 @@ function Home() {
 function Feature({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-accent/10 text-accent">{icon}</span>
+      <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-accent/10 text-accent">
+        {icon}
+      </span>
       <span>{label}</span>
     </div>
   );

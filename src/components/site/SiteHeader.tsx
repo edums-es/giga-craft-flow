@@ -1,20 +1,24 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingBag } from "lucide-react";
-import logo from "@/assets/giga-logo.asset.json";
 import { useCartCount, useHydrated } from "@/lib/cart";
-import { SITE } from "@/lib/site-config";
+import { useSiteBrandConfig } from "@/lib/use-site-brand-config";
 
 export function SiteHeader() {
   const count = useCartCount();
   const hydrated = useHydrated();
+  const brand = useSiteBrandConfig();
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="container-giga flex h-20 items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo.url} alt={SITE.nome} className="h-12 w-auto" />
+          <img src={brand.logoUrl} alt={brand.nome} className="h-12 w-auto object-contain" />
         </Link>
         <nav className="hidden gap-8 text-sm font-medium text-muted-foreground md:flex">
-          <Link to="/" activeOptions={{ exact: true }} className="hover:text-foreground [&.active]:text-foreground">
+          <Link
+            to="/"
+            activeOptions={{ exact: true }}
+            className="hover:text-foreground [&.active]:text-foreground"
+          >
             Início
           </Link>
           <Link to="/catalogo" className="hover:text-foreground [&.active]:text-foreground">

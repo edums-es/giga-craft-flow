@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Cormorant Garamond", "Playfair Display", serif;
-  --font-sans: "Inter", "Helvetica Neue", system-ui, sans-serif;
+  --font-sans: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-display: var(--font-sans);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -44,9 +44,9 @@
   --radius: 0.85rem;
 
   /* Giga dark palette */
-  --ink: oklch(0.09 0.01 260);           /* deep near-black */
-  --surface: oklch(0.14 0.012 265);      /* card base */
-  --surface-2: oklch(0.18 0.014 265);    /* elevated */
+  --ink: oklch(0.09 0.01 260); /* deep near-black */
+  --surface: oklch(0.14 0.012 265); /* card base */
+  --surface-2: oklch(0.18 0.014 265); /* elevated */
   --cream: oklch(0.96 0.012 80);
   --nude: oklch(0.24 0.02 40);
   --rose-gold: oklch(0.78 0.11 45);
@@ -79,16 +79,20 @@
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, .font-display {
+  h1,
+  h2,
+  h3,
+  .font-display {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: 0;
     color: var(--color-foreground);
   }
   ::selection {
@@ -116,7 +120,9 @@
   border: 1px solid var(--color-border);
   font-weight: 500;
   transition: all 0.2s ease;
-  &:hover { border-color: var(--color-rose-gold); }
+  &:hover {
+    border-color: var(--color-rose-gold);
+  }
 }
 
 @utility btn-gold {
@@ -130,8 +136,13 @@
   color: oklch(0.12 0.01 260);
   font-weight: 600;
   box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--color-rose-gold) 55%, transparent);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  &:hover { transform: translateY(-1px); box-shadow: 0 14px 34px -12px color-mix(in oklab, var(--color-rose-gold) 65%, transparent); }
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 34px -12px color-mix(in oklab, var(--color-rose-gold) 65%, transparent);
+  }
 }
 
 @utility card-elegant {
@@ -156,4 +167,18 @@
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+}
+
+@utility panel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+  &:hover {
+    color: var(--color-rose-gold-soft);
+  }
 }

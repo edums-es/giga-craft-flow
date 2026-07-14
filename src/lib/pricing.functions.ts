@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { calcularPreco, type PricingResult } from "./pricing";
+import { calcularPreco } from "./pricing.engine";
+import type { PricingResult } from "./pricing.shared";
 
 const schema = z.object({
   slug: z.string().min(1),

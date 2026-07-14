@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.pnpm-store/
 dist
 dist-ssr
 .output
@@ -15,6 +16,8 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+.env
+*.zip
 
 # Wrangler / Cloudflare
 .wrangler/

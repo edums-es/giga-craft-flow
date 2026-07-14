@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trash2, ArrowRight, MessageCircle } from "lucide-react";
+import { Trash2, ArrowRight, MessageCircle, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { useCart, removeFromCart, clearCart, useHydrated } from "@/lib/cart";
 import { formatBRL } from "@/lib/pricing";
-import { SITE, whatsappLink, novoCodigoOrcamento } from "@/lib/site-config";
-import { supabase } from "@/integrations/supabase/client";
+import { SITE, whatsappLink } from "@/lib/site-config";
+import { submitQuote, type SubmittedQuoteItem } from "@/lib/quote.functions";
 
 export const Route = createFileRoute("/orcamento")({
   head: () => ({
@@ -34,54 +35,62 @@ type Cliente = z.infer<typeof clienteSchema>;
 function OrcamentoPage() {
   const items = useCart();
   const hydrated = useHydrated();
+  const submitQuoteFn = useServerFn(submitQuote);
   const total = items.reduce((acc, i) => acc + i.precoTotal, 0);
   const prazoMax = items.reduce((acc, i) => Math.max(acc, i.prazoDiasUteis), 0);
 
   const [form, setForm] = useState<Cliente>({
-    nome: "", whatsapp: "", email: "", empresa: "", cidade: "", observacao: "",
+    nome: "",
+    whatsapp: "",
+    email: "",
+    empresa: "",
+    cidade: "",
+    observacao: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFinalize = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     const parsed = clienteSchema.safeParse(form);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
-      parsed.error.issues.forEach((i) => { errs[i.path[0] as string] = i.message; });
+      parsed.error.issues.forEach((i) => {
+        errs[i.path[0] as string] = i.message;
+      });
       setErrors(errs);
       return;
     }
     setErrors({});
     if (items.length === 0) return;
 
-    const codigo = novoCodigoOrcamento();
-    // Persiste na base (RLS permite insert anônimo com validação)
     try {
-      await supabase.from("quotes").insert({
-        codigo,
-        cliente_nome: parsed.data.nome,
-        cliente_whatsapp: parsed.data.whatsapp,
-        cliente_email: parsed.data.email || null,
-        cliente_empresa: parsed.data.empresa || null,
-        cliente_cidade: parsed.data.cidade || null,
-        observacao: parsed.data.observacao || null,
-        items: items.map((i) => ({
-          nome: i.nome,
-          quantidade: i.config.quantidade,
-          precoUnitario: i.precoUnitario,
-          precoTotal: i.precoTotal,
-          resumo: i.resumo,
-          observacao: i.observacao ?? null,
-        })) as never,
-        total,
-        prazo_dias: prazoMax,
+      setSubmitting(true);
+      const quote = await submitQuoteFn({
+        data: {
+          cliente: parsed.data,
+          items: items.map((i) => ({
+            config: i.config,
+            observacao: i.observacao,
+          })),
+        },
       });
+      const mensagem = buildMessage(
+        quote.codigo,
+        parsed.data,
+        quote.items,
+        quote.total,
+        quote.prazoDias,
+      );
+      window.open(whatsappLink(mensagem), "_blank");
+      clearCart();
     } catch (err) {
-      console.error("Falha ao salvar orçamento", err);
+      setSubmitError(err instanceof Error ? err.message : "Não foi possível salvar o orçamento.");
+    } finally {
+      setSubmitting(false);
     }
-    const mensagem = buildMessage(codigo, parsed.data, items, total, prazoMax);
-    window.open(whatsappLink(mensagem), "_blank");
-    clearCart();
   };
 
   return (
@@ -90,12 +99,16 @@ function OrcamentoPage() {
       <div className="container-giga py-12">
         <span className="text-xs uppercase tracking-[0.3em] text-accent">Orçamento</span>
         <h1 className="mt-2 font-display text-5xl">Meu orçamento</h1>
-        <p className="mt-2 text-muted-foreground">Revise os itens, informe seus dados e finalize direto no WhatsApp da Giga.</p>
+        <p className="mt-2 text-muted-foreground">
+          Revise os itens, informe seus dados e finalize direto no WhatsApp da Giga.
+        </p>
 
         {!hydrated ? null : items.length === 0 ? (
           <div className="mt-10 rounded-3xl border border-dashed border-border p-14 text-center">
             <p className="font-display text-2xl">Seu orçamento está vazio</p>
-            <p className="mt-2 text-muted-foreground">Adicione produtos do catálogo para começar.</p>
+            <p className="mt-2 text-muted-foreground">
+              Adicione produtos do catálogo para começar.
+            </p>
             <Link to="/catalogo" className="btn-gold mt-6 inline-flex">
               Ver catálogo <ArrowRight className="h-4 w-4" />
             </Link>
@@ -108,23 +121,31 @@ function OrcamentoPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-display text-xl">{item.nome}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">{item.config.quantidade} unidades</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {item.config.quantidade} unidades
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-display text-2xl text-accent">{formatBRL(item.precoTotal)}</p>
+                      <p className="font-display text-2xl text-accent">
+                        {formatBRL(item.precoTotal)}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {formatBRL(item.precoUnitario)} / un.
                       </p>
                     </div>
                   </div>
                   <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-nude/50 p-3 font-sans text-xs text-muted-foreground">
-{item.resumo}
+                    {item.resumo}
                   </pre>
                   {item.observacao && (
-                    <p className="mt-2 text-xs text-muted-foreground"><b>Obs:</b> {item.observacao}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      <b>Obs:</b> {item.observacao}
+                    </p>
                   )}
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Prazo estimado: {item.prazoDiasUteis} dias úteis</span>
+                    <span className="text-xs text-muted-foreground">
+                      Prazo estimado: {item.prazoDiasUteis} dias úteis
+                    </span>
                     <button
                       type="button"
                       onClick={() => removeFromCart(item.id)}
@@ -146,19 +167,40 @@ function OrcamentoPage() {
                 Prazo geral: até {prazoMax} dias úteis após aprovação da arte.
               </p>
 
-              <Field label="Nome*" value={form.nome} error={errors.nome}
-                onChange={(v) => setForm({ ...form, nome: v })} />
-              <Field label="WhatsApp*" value={form.whatsapp} error={errors.whatsapp}
-                onChange={(v) => setForm({ ...form, whatsapp: v })} placeholder="(11) 99999-9999" />
-              <Field label="E-mail" value={form.email ?? ""} error={errors.email}
-                onChange={(v) => setForm({ ...form, email: v })} />
-              <Field label="Empresa" value={form.empresa ?? ""}
-                onChange={(v) => setForm({ ...form, empresa: v })} />
-              <Field label="Cidade" value={form.cidade ?? ""}
-                onChange={(v) => setForm({ ...form, cidade: v })} />
+              <Field
+                label="Nome*"
+                value={form.nome}
+                error={errors.nome}
+                onChange={(v) => setForm({ ...form, nome: v })}
+              />
+              <Field
+                label="WhatsApp*"
+                value={form.whatsapp}
+                error={errors.whatsapp}
+                onChange={(v) => setForm({ ...form, whatsapp: v })}
+                placeholder="(11) 99999-9999"
+              />
+              <Field
+                label="E-mail"
+                value={form.email ?? ""}
+                error={errors.email}
+                onChange={(v) => setForm({ ...form, email: v })}
+              />
+              <Field
+                label="Empresa"
+                value={form.empresa ?? ""}
+                onChange={(v) => setForm({ ...form, empresa: v })}
+              />
+              <Field
+                label="Cidade"
+                value={form.cidade ?? ""}
+                onChange={(v) => setForm({ ...form, cidade: v })}
+              />
 
               <div>
-                <label className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">Observações</label>
+                <label className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+                  Observações
+                </label>
                 <textarea
                   rows={3}
                   value={form.observacao ?? ""}
@@ -168,11 +210,22 @@ function OrcamentoPage() {
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Ao finalizar, você concorda com o processo de aprovação de arte e prazos estimados da {SITE.nome}.
+                Ao finalizar, você concorda com o processo de aprovação de arte e prazos estimados
+                da {SITE.nome}.
               </p>
+              {submitError && <p className="text-xs text-destructive">{submitError}</p>}
 
-              <button type="submit" className="btn-gold w-full">
-                <MessageCircle className="h-4 w-4" /> Finalizar no WhatsApp
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-gold w-full disabled:opacity-60"
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MessageCircle className="h-4 w-4" />
+                )}
+                Finalizar no WhatsApp
               </button>
             </form>
           </div>
@@ -185,13 +238,23 @@ function OrcamentoPage() {
 }
 
 function Field({
-  label, value, onChange, error, placeholder,
+  label,
+  value,
+  onChange,
+  error,
+  placeholder,
 }: {
-  label: string; value: string; onChange: (v: string) => void; error?: string; placeholder?: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  placeholder?: string;
 }) {
   return (
     <div>
-      <label className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">{label}</label>
+      <label className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+        {label}
+      </label>
       <input
         type="text"
         value={value}
@@ -207,7 +270,7 @@ function Field({
 function buildMessage(
   codigo: string,
   cliente: Cliente,
-  items: ReturnType<typeof useCart>,
+  items: SubmittedQuoteItem[],
   total: number,
   prazoMax: number,
 ): string {

@@ -22,9 +22,14 @@ import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as AuthenticatedAdminParametrosRouteImport } from './routes/_authenticated/admin.parametros'
 import { Route as AuthenticatedAdminOrcamentosRouteImport } from './routes/_authenticated/admin.orcamentos'
+import { Route as AuthenticatedAdminFornecedoresRouteImport } from './routes/_authenticated/admin.fornecedores'
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin.financeiro'
+import { Route as AuthenticatedAdminEstoqueRouteImport } from './routes/_authenticated/admin.estoque'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminComprasRouteImport } from './routes/_authenticated/admin.compras'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminOrcamentosNovoRouteImport } from './routes/_authenticated/admin.orcamentos.novo'
+import { Route as AuthenticatedAdminOrcamentosIdImprimirRouteImport } from './routes/_authenticated/admin.orcamentos.$id.imprimir'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -94,10 +99,22 @@ const AuthenticatedAdminOrcamentosRoute =
     path: '/orcamentos',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminFornecedoresRoute =
+  AuthenticatedAdminFornecedoresRouteImport.update({
+    id: '/fornecedores',
+    path: '/fornecedores',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFinanceiroRoute =
   AuthenticatedAdminFinanceiroRouteImport.update({
     id: '/financeiro',
     path: '/financeiro',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEstoqueRoute =
+  AuthenticatedAdminEstoqueRouteImport.update({
+    id: '/estoque',
+    path: '/estoque',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminConfiguracoesRoute =
@@ -106,11 +123,29 @@ const AuthenticatedAdminConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminComprasRoute =
+  AuthenticatedAdminComprasRouteImport.update({
+    id: '/compras',
+    path: '/compras',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminClientesRoute =
   AuthenticatedAdminClientesRouteImport.update({
     id: '/clientes',
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminOrcamentosNovoRoute =
+  AuthenticatedAdminOrcamentosNovoRouteImport.update({
+    id: '/novo',
+    path: '/novo',
+    getParentRoute: () => AuthenticatedAdminOrcamentosRoute,
+  } as any)
+const AuthenticatedAdminOrcamentosIdImprimirRoute =
+  AuthenticatedAdminOrcamentosIdImprimirRouteImport.update({
+    id: '/$id/imprimir',
+    path: '/$id/imprimir',
+    getParentRoute: () => AuthenticatedAdminOrcamentosRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -122,13 +157,18 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/produto/$slug': typeof ProdutoSlugRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/compras': typeof AuthenticatedAdminComprasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
-  '/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRouteWithChildren
   '/admin/parametros': typeof AuthenticatedAdminParametrosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/orcamentos/novo': typeof AuthenticatedAdminOrcamentosNovoRoute
+  '/admin/orcamentos/$id/imprimir': typeof AuthenticatedAdminOrcamentosIdImprimirRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,13 +178,18 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/compras': typeof AuthenticatedAdminComprasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
-  '/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRoute
+  '/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRouteWithChildren
   '/admin/parametros': typeof AuthenticatedAdminParametrosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/orcamentos/novo': typeof AuthenticatedAdminOrcamentosNovoRoute
+  '/admin/orcamentos/$id/imprimir': typeof AuthenticatedAdminOrcamentosIdImprimirRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,13 +202,18 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/produto/$slug': typeof ProdutoSlugRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/compras': typeof AuthenticatedAdminComprasRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/estoque': typeof AuthenticatedAdminEstoqueRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
-  '/_authenticated/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRoute
+  '/_authenticated/admin/fornecedores': typeof AuthenticatedAdminFornecedoresRoute
+  '/_authenticated/admin/orcamentos': typeof AuthenticatedAdminOrcamentosRouteWithChildren
   '/_authenticated/admin/parametros': typeof AuthenticatedAdminParametrosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/orcamentos/novo': typeof AuthenticatedAdminOrcamentosNovoRoute
+  '/_authenticated/admin/orcamentos/$id/imprimir': typeof AuthenticatedAdminOrcamentosIdImprimirRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -176,13 +226,18 @@ export interface FileRouteTypes {
     | '/admin'
     | '/produto/$slug'
     | '/admin/clientes'
+    | '/admin/compras'
     | '/admin/configuracoes'
+    | '/admin/estoque'
     | '/admin/financeiro'
+    | '/admin/fornecedores'
     | '/admin/orcamentos'
     | '/admin/parametros'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin/'
+    | '/admin/orcamentos/novo'
+    | '/admin/orcamentos/$id/imprimir'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -192,13 +247,18 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/produto/$slug'
     | '/admin/clientes'
+    | '/admin/compras'
     | '/admin/configuracoes'
+    | '/admin/estoque'
     | '/admin/financeiro'
+    | '/admin/fornecedores'
     | '/admin/orcamentos'
     | '/admin/parametros'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin'
+    | '/admin/orcamentos/novo'
+    | '/admin/orcamentos/$id/imprimir'
   id:
     | '__root__'
     | '/'
@@ -210,13 +270,18 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/produto/$slug'
     | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/compras'
     | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/estoque'
     | '/_authenticated/admin/financeiro'
+    | '/_authenticated/admin/fornecedores'
     | '/_authenticated/admin/orcamentos'
     | '/_authenticated/admin/parametros'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/orcamentos/novo'
+    | '/_authenticated/admin/orcamentos/$id/imprimir'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -322,11 +387,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrcamentosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/fornecedores': {
+      id: '/_authenticated/admin/fornecedores'
+      path: '/fornecedores'
+      fullPath: '/admin/fornecedores'
+      preLoaderRoute: typeof AuthenticatedAdminFornecedoresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/financeiro': {
       id: '/_authenticated/admin/financeiro'
       path: '/financeiro'
       fullPath: '/admin/financeiro'
       preLoaderRoute: typeof AuthenticatedAdminFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/estoque': {
+      id: '/_authenticated/admin/estoque'
+      path: '/estoque'
+      fullPath: '/admin/estoque'
+      preLoaderRoute: typeof AuthenticatedAdminEstoqueRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/configuracoes': {
@@ -336,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/compras': {
+      id: '/_authenticated/admin/compras'
+      path: '/compras'
+      fullPath: '/admin/compras'
+      preLoaderRoute: typeof AuthenticatedAdminComprasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/clientes': {
       id: '/_authenticated/admin/clientes'
       path: '/clientes'
@@ -343,14 +429,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/orcamentos/novo': {
+      id: '/_authenticated/admin/orcamentos/novo'
+      path: '/novo'
+      fullPath: '/admin/orcamentos/novo'
+      preLoaderRoute: typeof AuthenticatedAdminOrcamentosNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminOrcamentosRoute
+    }
+    '/_authenticated/admin/orcamentos/$id/imprimir': {
+      id: '/_authenticated/admin/orcamentos/$id/imprimir'
+      path: '/$id/imprimir'
+      fullPath: '/admin/orcamentos/$id/imprimir'
+      preLoaderRoute: typeof AuthenticatedAdminOrcamentosIdImprimirRouteImport
+      parentRoute: typeof AuthenticatedAdminOrcamentosRoute
+    }
   }
 }
 
+interface AuthenticatedAdminOrcamentosRouteChildren {
+  AuthenticatedAdminOrcamentosNovoRoute: typeof AuthenticatedAdminOrcamentosNovoRoute
+  AuthenticatedAdminOrcamentosIdImprimirRoute: typeof AuthenticatedAdminOrcamentosIdImprimirRoute
+}
+
+const AuthenticatedAdminOrcamentosRouteChildren: AuthenticatedAdminOrcamentosRouteChildren =
+  {
+    AuthenticatedAdminOrcamentosNovoRoute:
+      AuthenticatedAdminOrcamentosNovoRoute,
+    AuthenticatedAdminOrcamentosIdImprimirRoute:
+      AuthenticatedAdminOrcamentosIdImprimirRoute,
+  }
+
+const AuthenticatedAdminOrcamentosRouteWithChildren =
+  AuthenticatedAdminOrcamentosRoute._addFileChildren(
+    AuthenticatedAdminOrcamentosRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminComprasRoute: typeof AuthenticatedAdminComprasRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminEstoqueRoute: typeof AuthenticatedAdminEstoqueRoute
   AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
-  AuthenticatedAdminOrcamentosRoute: typeof AuthenticatedAdminOrcamentosRoute
+  AuthenticatedAdminFornecedoresRoute: typeof AuthenticatedAdminFornecedoresRoute
+  AuthenticatedAdminOrcamentosRoute: typeof AuthenticatedAdminOrcamentosRouteWithChildren
   AuthenticatedAdminParametrosRoute: typeof AuthenticatedAdminParametrosRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRoute
@@ -359,9 +480,13 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminComprasRoute: AuthenticatedAdminComprasRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminEstoqueRoute: AuthenticatedAdminEstoqueRoute,
   AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
-  AuthenticatedAdminOrcamentosRoute: AuthenticatedAdminOrcamentosRoute,
+  AuthenticatedAdminFornecedoresRoute: AuthenticatedAdminFornecedoresRoute,
+  AuthenticatedAdminOrcamentosRoute:
+    AuthenticatedAdminOrcamentosRouteWithChildren,
   AuthenticatedAdminParametrosRoute: AuthenticatedAdminParametrosRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRoute,
@@ -394,3 +519,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

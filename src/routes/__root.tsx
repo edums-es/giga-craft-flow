@@ -84,14 +84,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Monte seu orçamento de sacolas, tags e cartões personalizados em minutos e finalize direto no WhatsApp com a Giga Personalizados.",
       },
       { name: "author", content: "Giga Personalizados" },
-      { property: "og:title", content: "Giga Personalizados — Sacolas, tags e cartões com a sua marca" },
-      { property: "og:description", content: "Monte seu orçamento de sacolas, tags e cartões personalizados em minutos e finalize direto no WhatsApp com a Giga Personalizados." },
+      {
+        property: "og:title",
+        content: "Giga Personalizados — Sacolas, tags e cartões com a sua marca",
+      },
+      {
+        property: "og:description",
+        content:
+          "Monte seu orçamento de sacolas, tags e cartões personalizados em minutos e finalize direto no WhatsApp com a Giga Personalizados.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Giga Personalizados — Sacolas, tags e cartões com a sua marca" },
-      { name: "twitter:description", content: "Monte seu orçamento de sacolas, tags e cartões personalizados em minutos e finalize direto no WhatsApp com a Giga Personalizados." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0cf4935-c738-4a03-a0b6-56f682c6faf1/id-preview-e5441c20--af4b4196-dc9b-439a-a0a8-050aa65aedff.lovable.app-1783913701256.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0cf4935-c738-4a03-a0b6-56f682c6faf1/id-preview-e5441c20--af4b4196-dc9b-439a-a0a8-050aa65aedff.lovable.app-1783913701256.png" },
+      {
+        name: "twitter:title",
+        content: "Giga Personalizados — Sacolas, tags e cartões com a sua marca",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Monte seu orçamento de sacolas, tags e cartões personalizados em minutos e finalize direto no WhatsApp com a Giga Personalizados.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0cf4935-c738-4a03-a0b6-56f682c6faf1/id-preview-e5441c20--af4b4196-dc9b-439a-a0a8-050aa65aedff.lovable.app-1783913701256.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0cf4935-c738-4a03-a0b6-56f682c6faf1/id-preview-e5441c20--af4b4196-dc9b-439a-a0a8-050aa65aedff.lovable.app-1783913701256.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -100,7 +122,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
     ],
   }),
@@ -112,7 +134,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
