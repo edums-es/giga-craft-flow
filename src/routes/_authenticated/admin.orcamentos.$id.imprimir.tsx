@@ -39,6 +39,12 @@ type Quote = {
   pricing_snapshot: {
     subtotal?: number;
     desconto?: number;
+    pagamento?: {
+      forma?: string;
+      formaLabel?: string;
+      trocoPara?: number;
+      troco?: number;
+    };
   } | null;
 };
 
@@ -83,6 +89,11 @@ function ImprimirOrcamentoPage() {
     quote.items.reduce((sum, item) => sum + Number(item.precoTotal || 0), 0);
   const discount =
     quote.pricing_snapshot?.desconto ?? Math.max(0, subtotal - Number(quote.total || 0));
+  const payment = quote.pricing_snapshot?.pagamento;
+  const showPayment =
+    payment && payment.forma && payment.forma !== "nao_informado" && payment.formaLabel;
+  const showChange =
+    payment?.forma === "dinheiro" && Number(payment.trocoPara || 0) > 0;
   const companyName = siteConfig?.nome || "Giga Personalizados";
   const proposalLogo = siteConfig?.logo_url || logo.url;
 
@@ -191,6 +202,17 @@ function ImprimirOrcamentoPage() {
               <span>Total</span>
               <span>{formatBRL(Number(quote.total || 0))}</span>
             </div>
+            {showPayment && (
+              <div className="mt-4 space-y-2 border-t border-zinc-200 pt-4">
+                <Line label="Pagamento" value={payment.formaLabel ?? ""} />
+                {showChange && (
+                  <>
+                    <Line label="Troco para" value={formatBRL(Number(payment.trocoPara || 0))} />
+                    <Line label="Troco" value={formatBRL(Number(payment.troco || 0))} />
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </section>
 

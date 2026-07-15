@@ -52,6 +52,8 @@ type QuoteItemDraft = {
   computation?: PricingComputation;
 };
 
+type PaymentMethod = "nao_informado" | "dinheiro" | "pix" | "cartao" | "boleto";
+
 const defaultConfig: PricingInput = {
   slug: "sacola-personalizada",
   quantidade: 100,
@@ -96,6 +98,8 @@ function NovoOrcamentoPage() {
   const [descontoValor, setDescontoValor] = useState("0");
   const [descontoPercentual, setDescontoPercentual] = useState("0");
   const [validadeDias, setValidadeDias] = useState("7");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("nao_informado");
+  const [trocoPara, setTrocoPara] = useState("");
   const [saveCustomer, setSaveCustomer] = useState(true);
   const [savedQuote, setSavedQuote] = useState<{ id: string; codigo: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -135,6 +139,12 @@ function NovoOrcamentoPage() {
     );
     return { subtotal, custo, desconto, total, lucro, margem, prazo };
   }, [items, descontoValor, descontoPercentual]);
+
+  const troco = useMemo(() => {
+    const recebido = Number(trocoPara || 0);
+    if (paymentMethod !== "dinheiro" || recebido <= 0) return 0;
+    return round2(Math.max(0, recebido - totals.total));
+  }, [paymentMethod, totals.total, trocoPara]);
 
   const calculateItem = useMutation({
     mutationFn: async (id: string) => {
@@ -252,6 +262,12 @@ function NovoOrcamentoPage() {
             custoTotal: totals.custo,
             lucroEstimado: totals.lucro,
             margemEstimada: totals.margem,
+            pagamento: {
+              forma: paymentMethod,
+              formaLabel: paymentLabel(paymentMethod),
+              trocoPara: paymentMethod === "dinheiro" ? Number(trocoPara || 0) : 0,
+              troco,
+            },
             items: internalItems,
           },
         })
@@ -842,6 +858,39 @@ function NovoOrcamentoPage() {
             value={validadeDias}
             onChange={setValidadeDias}
           />
+          <div className="rounded-xl border border-border/70 bg-secondary/25 p-3">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Pagamento</p>
+            <label className="mt-2 block">
+              <span className="sr-only">Forma de pagamento</span>
+              <select
+                value={paymentMethod}
+                onChange={(event) => {
+                  const value = event.target.value as PaymentMethod;
+                  setPaymentMethod(value);
+                  if (value !== "dinheiro") setTrocoPara("");
+                }}
+                className="w-full rounded-lg border border-border bg-input px-3 py-2 text-sm outline-none focus:border-accent"
+              >
+                <option value="nao_informado">Nao informado</option>
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">Pix</option>
+                <option value="cartao">Cartao</option>
+                <option value="boleto">Boleto</option>
+              </select>
+            </label>
+            {paymentMethod === "dinheiro" && (
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <Field
+                  type="number"
+                  label="Troco para R$"
+                  value={trocoPara}
+                  onChange={setTrocoPara}
+                  step="0.01"
+                />
+                <MiniStat label="Troco" value={formatBRL(troco)} />
+              </div>
+            )}
+          </div>
           <div className="rounded-xl bg-accent/10 p-4">
             <p className="text-xs uppercase tracking-widest text-accent">Total da proposta</p>
             <p className="mt-1 font-display text-3xl text-accent">{formatBRL(totals.total)}</p>
@@ -1072,6 +1121,17 @@ function SummaryLine({ label, value, strong }: { label: string; value: string; s
       <span className={strong ? "font-medium text-accent" : ""}>{value}</span>
     </div>
   );
+}
+
+function paymentLabel(method: PaymentMethod) {
+  const labels: Record<PaymentMethod, string> = {
+    nao_informado: "Nao informado",
+    dinheiro: "Dinheiro",
+    pix: "Pix",
+    cartao: "Cartao",
+    boleto: "Boleto",
+  };
+  return labels[method];
 }
 
 function round2(value: number) {
