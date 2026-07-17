@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/parametros")({
 });
 
 interface Params {
-  materiais: { offset180: number; matte220: number; glossy220: number };
+  materiais: { offset180: number; matte220: number; glossy220: number; offset90: number };
   reservaBrancaPorFolha: number;
   adicionalColoridaPorFolha: number;
   custoAlca: { poliester: number; gorgurao: number; sem: number };
@@ -26,7 +26,7 @@ interface Params {
 }
 
 const defaultParams: Params = {
-  materiais: { offset180: 0.274, matte220: 0.5001, glossy220: 0.6406 },
+  materiais: { offset180: 0.274, matte220: 0.5001, glossy220: 0.6406, offset90: 0.1204 },
   reservaBrancaPorFolha: 0.15,
   adicionalColoridaPorFolha: 0.2,
   custoAlca: { poliester: 0.68, gorgurao: 0.7, sem: 0 },
@@ -128,6 +128,11 @@ function ParametrosPage() {
             label="Glossy 220g"
             value={params.materiais.glossy220}
             onChange={(v) => update({ materiais: { ...params.materiais, glossy220: v } })}
+          />
+          <NumberField
+            label="Offset 90g"
+            value={params.materiais.offset90}
+            onChange={(v) => update({ materiais: { ...params.materiais, offset90: v } })}
           />
         </Section>
 

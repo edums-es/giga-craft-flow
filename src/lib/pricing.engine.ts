@@ -36,9 +36,11 @@ interface InternalSacolaConfig {
 }
 
 interface InternalProductConfig {
-  unidadesPorFolha: number;
+  modoConsumo: "unidades_por_folha" | "folhas_por_unidade";
+  fator: number;
   acabamentoPorUnidade: number;
   capacidadeDia: number;
+  setupDias?: number;
 }
 
 export interface PricingInternalSnapshot {
@@ -84,6 +86,7 @@ const DEFAULT_PRICING_PARAMS: PricingParams = {
     offset180: 0.274,
     matte220: 0.5001,
     glossy220: 0.6406,
+    offset90: 0.1204,
   },
   reservaBrancaPorFolha: 0.15,
   adicionalColoridaPorFolha: 0.2,
@@ -122,14 +125,64 @@ const SACOLA_COLOR_ADDITIONAL_PER_UNIT: Record<SacolaSize, number> = {
 
 const PRODUCT_INTERNAL: Record<string, InternalProductConfig> = {
   "tag-de-roupa": {
-    unidadesPorFolha: 12,
+    modoConsumo: "unidades_por_folha",
+    fator: 12,
     acabamentoPorUnidade: 0.03,
     capacidadeDia: 120,
   },
   "cartao-de-agradecimento": {
-    unidadesPorFolha: 12,
+    modoConsumo: "unidades_por_folha",
+    fator: 12,
     acabamentoPorUnidade: 0,
     capacidadeDia: 150,
+  },
+  "tag-para-brincos": {
+    modoConsumo: "unidades_por_folha",
+    fator: 12,
+    acabamentoPorUnidade: 0.05,
+    capacidadeDia: 120,
+  },
+  "tag-para-colar-e-brincos": {
+    modoConsumo: "unidades_por_folha",
+    fator: 6,
+    acabamentoPorUnidade: 0.08,
+    capacidadeDia: 80,
+  },
+  "caixa-para-joia-pp": {
+    modoConsumo: "folhas_por_unidade",
+    fator: 1,
+    acabamentoPorUnidade: 0.25,
+    capacidadeDia: 15,
+  },
+  "caixa-para-conjunto-p": {
+    modoConsumo: "folhas_por_unidade",
+    fator: 2,
+    acabamentoPorUnidade: 0.4,
+    capacidadeDia: 10,
+  },
+  "caixa-sacolinha": {
+    modoConsumo: "folhas_por_unidade",
+    fator: 1,
+    acabamentoPorUnidade: 0.3,
+    capacidadeDia: 18,
+  },
+  "caixa-almofada": {
+    modoConsumo: "folhas_por_unidade",
+    fator: 1,
+    acabamentoPorUnidade: 0.2,
+    capacidadeDia: 25,
+  },
+  "cartao-de-visita": {
+    modoConsumo: "unidades_por_folha",
+    fator: 10,
+    acabamentoPorUnidade: 0,
+    capacidadeDia: 200,
+  },
+  "santinho-politico": {
+    modoConsumo: "unidades_por_folha",
+    fator: 6,
+    acabamentoPorUnidade: 0,
+    capacidadeDia: 300,
   },
 };
 
@@ -271,17 +324,36 @@ export function calcularPrecoComParametros(
     const config = PRODUCT_INTERNAL[input.slug];
     if (!config) return { publicResult: vazio("Produto ainda sem regra de preço") };
 
-    const papel = custoPorFolha / config.unidadesPorFolha;
-    const reserva = (params.reservaBrancaPorFolha * passesImpressao) / config.unidadesPorFolha;
+    const fatorSeguro =
+      config.modoConsumo === "unidades_por_folha"
+        ? Math.max(1, config.fator)
+        : Math.max(0.001, config.fator);
+    const papel =
+      config.modoConsumo === "unidades_por_folha"
+        ? custoPorFolha / fatorSeguro
+        : custoPorFolha * fatorSeguro;
+    const reserva =
+      config.modoConsumo === "unidades_por_folha"
+        ? (params.reservaBrancaPorFolha * passesImpressao) / fatorSeguro
+        : params.reservaBrancaPorFolha * fatorSeguro * passesImpressao;
     const adicionalCor = impressaoColorida
-      ? (params.adicionalColoridaPorFolha * passesImpressao) / config.unidadesPorFolha
+      ? config.modoConsumo === "unidades_por_folha"
+        ? (params.adicionalColoridaPorFolha * passesImpressao) / fatorSeguro
+        : params.adicionalColoridaPorFolha * fatorSeguro * passesImpressao
       : 0;
     const acabamento = config.acabamentoPorUnidade;
 
     custoUnitario = papel + reserva + adicionalCor + acabamento;
     capacidadeDia = config.capacidadeDia;
-    setupDias = 1;
-    Object.assign(breakdown, { papel, reserva, adicionalCor, acabamento, passesImpressao });
+    setupDias = config.setupDias ?? 1;
+    Object.assign(breakdown, {
+      papel,
+      reserva,
+      adicionalCor,
+      acabamento,
+      fator: fatorSeguro,
+      passesImpressao,
+    });
   }
 
   const custoProducao = custoUnitario * quantidade;
@@ -388,6 +460,7 @@ export function aplicarCustosDeInsumos(
     if (!unitCost) continue;
 
     if (nome.includes("offset") && nome.includes("180")) next.materiais.offset180 = unitCost;
+    if (nome.includes("offset") && nome.includes("90")) next.materiais.offset90 = unitCost;
     if (nome.includes("matte") && nome.includes("220")) next.materiais.matte220 = unitCost;
     if (nome.includes("glossy") && nome.includes("220")) next.materiais.glossy220 = unitCost;
     if (nome.includes("alca") && nome.includes("poliester"))

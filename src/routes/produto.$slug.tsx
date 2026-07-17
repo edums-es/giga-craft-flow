@@ -64,6 +64,10 @@ function ProdutoPage() {
   const [observacao, setObservacao] = useState("");
   const [adicionado, setAdicionado] = useState(false);
 
+  useEffect(() => {
+    setMaterialId(produto.slug === "santinho-politico" ? "offset90" : "offset180");
+  }, [produto.slug]);
+
   const input = useMemo(
     () => ({
       slug: produto.slug,
@@ -141,7 +145,7 @@ function ProdutoPage() {
               )}
 
               <Step number={produto.tipo === "sacola" ? 2 : 1} title="Material">
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-4">
                   {MATERIAIS.map((m) => (
                     <Option
                       key={m.id}

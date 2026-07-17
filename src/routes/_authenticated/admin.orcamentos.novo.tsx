@@ -999,6 +999,7 @@ function productDefaults(slug: string): Partial<PricingInput> {
   return {
     ...defaultConfig,
     slug,
+    materialId: slug === "santinho-politico" ? "offset90" : defaultConfig.materialId,
     tamanho: product?.tipo === "sacola" ? "p" : undefined,
     alca: product?.tipo === "sacola" ? "poliester" : undefined,
   };
@@ -1034,7 +1035,9 @@ function quoteSummary(config: PricingInput) {
       ? `Tamanho: ${SACOLAS.find((item) => item.id === config.tamanho)?.nome}`
       : custom
         ? `Medida: ${custom.medida}`
-        : null,
+        : product?.medida
+          ? `Medida: ${product.medida}`
+          : null,
     custom
       ? `Consumo: ${
           custom.modoConsumo === "unidades_por_folha"

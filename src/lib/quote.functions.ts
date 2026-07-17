@@ -7,7 +7,7 @@ import type { PricingInput } from "./pricing.shared";
 const pricingInputSchema = z.object({
   slug: z.string().min(1),
   quantidade: z.number().int().positive().max(100000),
-  materialId: z.enum(["offset180", "matte220", "glossy220"]),
+  materialId: z.enum(["offset180", "matte220", "glossy220", "offset90"]),
   cobertura: z.enum(["branca", "colorida", "texturizada", "alta"]),
   tamanho: z.enum(["mini", "p", "m", "g"]).optional(),
   alca: z.enum(["poliester", "gorgurao", "sem"]).optional(),
