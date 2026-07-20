@@ -10,6 +10,7 @@ const schema = z.object({
   cobertura: z.enum(["branca", "colorida", "texturizada", "alta"]),
   tamanho: z.enum(["mini", "p", "m", "g"]).optional(),
   alca: z.enum(["poliester", "gorgurao", "sem"]).optional(),
+  impressao: z.enum(["frente", "frente_verso"]).optional(),
   criacaoArte: z.boolean().optional(),
   urgencia: z.boolean().optional(),
 });
